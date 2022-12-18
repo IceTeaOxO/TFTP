@@ -50,8 +50,8 @@ def main():
         # Receive response data sent back by the server
         recvData, serverInfo = s.recvfrom(1024)
         #print(responseData)
-        print(recvData)
-        print(serverInfo)
+        # print(recvData)
+        # print(serverInfo)
         ## 接收伺服器的DATA
 
 

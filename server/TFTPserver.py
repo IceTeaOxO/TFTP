@@ -3,7 +3,7 @@ import struct
 import socket
 from threading import Thread
 import pathlib
-print(pathlib.Path().absolute())
+# print(pathlib.Path().absolute())
 
 # Client download thread
 def download_thread(fileName, clientInfo):
@@ -38,7 +38,7 @@ def download_thread(fileName, clientInfo):
     while True:
             # Read file contents 512 bytes from local server
             readFileData = f.read(512)
-            print("READFILE:",readFileData)
+            # print("READFILE:",readFileData)
             print("reading...:",fileNum)
             ## 如果成功讀取檔案，一次讀取512bytes檔案
             
