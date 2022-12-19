@@ -106,7 +106,7 @@ def upload_thread(fileName, clientInfo):
     fileNum = 0 #Indicates the serial number of the received file
     
     # Open the file in binary mode
-    f = open(fileName, 'wb')
+    f = open('server/'+fileName, 'wb')
     ## 開啟並寫入檔案
     
     # Create a UDP port
