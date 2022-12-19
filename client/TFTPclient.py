@@ -3,18 +3,32 @@
 import os
 import struct
 import socket
+import sys
 # import pathlib
 # print(pathlib.Path().absolute())
 ## 查詢當前路徑
 
 #Main function
+
+def run_test():
+    if len(sys.argv) != 1:
+        print('-'*30)
+        print("tips: if you path is /TFTP")
+        print("python3 client/TFTPclient.py")
+        print('-'*30)
+        exit()
+
+  
 def main():
+    run_test()
     ## ip 要連接上的設備ip位置
     ## FileName要下載的檔案名稱
-    # g_server_ip = input("Please key in the IP to download(If your server is local, key in 127.0.0.1)：")
+    # print("your default ip is 127.0.0.1")
+    # g_server_ip="127.0.0.1"
+    g_server_ip = input("Please key in the IP to download(If your server is local, key in 127.0.0.1)：")
     g_downloadFileName = input("Please key in the file's name(ex: Test.txt)：")
-    # print(g_server_ip, g_downloadFileName)
-    g_server_ip="127.0.0.1"
+    print(g_server_ip, g_downloadFileName)
+    
     # g_downloadFileName="bigfile.txt"
     
     
