@@ -1,17 +1,14 @@
 #coding=utf-8
  
-# 导包
 import sys
 import struct
 from socket import *
-import pathlib
-print(pathlib.Path().absolute())
+# import pathlib
+# print(pathlib.Path().absolute())
 
-# 全局变量
 g_server_ip = ''
 g_uploadFileName = ''
  
-#运行程序格式不正确
 def run_test():
 	"判断运行程序传入参数是否有错"
 	global g_server_ip
@@ -50,12 +47,8 @@ def main():
 	# 第一次接收数据
 	responseData = s.recvfrom(1024)
  
-	# print(responseData)
 	recvData, serverInfo = responseData
- 
-	#print(recvData)
-	#print(serverInfo)
- 
+
 	# 解包
 	packetOpt = struct.unpack("!H", recvData[:2])  #操作码
 	packetNum = struct.unpack("!H", recvData[2:4]) #块编号

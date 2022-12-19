@@ -2,43 +2,32 @@
 import struct
 import socket
 from threading import Thread
-import pathlib
+# import pathlib
 # print(pathlib.Path().absolute())
 
-# Client download thread
 def download_thread(fileName, clientInfo):
     print("Responsible for processing client download files")
     ## 下載線程
-    # Create a UDP socket
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    
     ## 開啟socket
-    
-    fileNum = 0 #Indicates the serial number of the received file
+    fileNum = 0 
     ## 使用計數器計算當前傳到第幾個檔案
-    
     try:
         f = open('server/'+fileName,'rb')
-        ## 伺服器嘗試創建檔案並使用二進制讀取
-        
-        
+        ## 伺服器使用二進制讀取檔案
         
         
     except:
         errorData = struct.pack('!HHHb', 5, 5, 5, fileNum)
         ## short,short,short,char
         
-        # Send an error message
-        s.sendto(errorData, clientInfo)  #Sent the message when the file does not exist
+        s.sendto(errorData, clientInfo)  
         print("download ERR:",errorData)
-        exit()  #Exit the download thread
-        
+        exit()  
         ## 如果發生錯誤，傳送錯誤訊息給客戶端，並且結束下載線程
         
     while True:
-            # Read file contents 512 bytes from local server
             readFileData = f.read(512)
-            # print("READFILE:",readFileData)
             print("reading...:",fileNum)
             ## 如果成功讀取檔案，一次讀取512bytes檔案
             
@@ -51,25 +40,19 @@ def download_thread(fileName, clientInfo):
                 fileNum=0
 
             sendData = struct.pack('!HH', 3, fileNum) + readFileData 
-            ## short,short,data
-            # print("download packet:",struct.unpack("!%ds"%len(readFileData),sendData[4:]))
+            ## short,short,data            
             
-            
-            # Send file data to the client
-            s.sendto(sendData, clientInfo)  #Data sent for the first time
+            s.sendto(sendData, clientInfo) 
             ## 將讀取到的資料傳送出去
             
             
-            # When the data received by the client is less than 516 bytes, it means that the transmission is completed!
             if len(sendData) < 516:
                 print("User"+str(clientInfo), end='')
                 print('：Download '+fileName+' completed！')
                 break
             ## 如果傳送出去的資料長度小於516bytes，則印出conpleted
                     
-            
                         
-            # Receiving data for the second time
             recvData, clientInfo = s.recvfrom(1024)
             #print(recvData, clientInfo)
             ## 接收客戶端傳來的DATA(ACK)
@@ -78,7 +61,6 @@ def download_thread(fileName, clientInfo):
             packetOpt = struct.unpack("!H", recvData[:2])  #Opcode
             packetNum = struct.unpack("!H", recvData[2:4]) #Block number
             ## 接收客戶端傳送回來的opcode,block num
-            #print(packetOpt, packetNum)
             print("download client ACK:",packetOpt,packetNum)
             
             
@@ -87,7 +69,6 @@ def download_thread(fileName, clientInfo):
                 print("File transfer error！")
                 break
             ## 如果收到的DATA opcode開頭不是ACK或者block num不等於當前的fileNum則跳出迴圈，關閉線程、socket
-            
             
     # Close file
     f.close()
@@ -99,17 +80,14 @@ def download_thread(fileName, clientInfo):
     exit()
 
 
-# Client uploading thread
 def upload_thread(fileName, clientInfo):
     print("Responsible for processing client upload files")
     ## 進入上傳線程(WRQ)
-    fileNum = 0 #Indicates the serial number of the received file
+    fileNum = 0 
     
     # Open the file in binary mode
     f = open('server/'+fileName, 'wb')
-    ## 開啟並寫入檔案
     
-    # Create a UDP port
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     
     sendDataFirst = struct.pack("!HH", 4, fileNum) 
@@ -120,7 +98,7 @@ def upload_thread(fileName, clientInfo):
 
     while True:
         # Receive data sent by the client
-        recvData, clientInfo = s.recvfrom(1024) #Client connects to my random port at second time
+        recvData, clientInfo = s.recvfrom(1024) 
         ## 接收客戶上傳的DATA，一次最多接收1024
         
         #print(recvData, clientInfo)
@@ -129,11 +107,7 @@ def upload_thread(fileName, clientInfo):
         packetOpt = struct.unpack("!H", recvData[:2])  #Identify opcode
         packetNum = struct.unpack("!H", recvData[2:4]) #Block number
         ## 將收到的DATA unpack，將opcode,blockNum記錄下來
-        
-        #print(packetOpt, packetNum)
-        
-        # Client upload data
-        # opcode == 3 means Data
+                
         if packetOpt[0] == 3 and packetNum[0] == fileNum:
             ## 如果接受到的opcode=3，且blockNum=fileNum，則寫入檔案
             #　Save data to file
@@ -143,7 +117,7 @@ def upload_thread(fileName, clientInfo):
             sendData = struct.pack("!HH", 4, fileNum)
             ## 將ACK訊息傳給客戶端
             # Reply client's ACK signal
-            s.sendto(sendData, clientInfo) #The second time using a random port to sent
+            s.sendto(sendData, clientInfo) 
             
             fileNum += 1
             ## 傳完之後fileNum+1，代表傳送第1個DATA packet
@@ -182,17 +156,12 @@ def main():
     
     print("TFTP Server start successfully!")
     print("Server is running...")
-    
-    ## 上面都是開啟伺服器
-    
+        
     while True:
         
         # Receive messages sent by the client
-        recvData, clientInfo = s.recvfrom(1024)  #　Client connects to port 69 at the first time
-        #print(clientInfo) 
+        recvData, clientInfo = s.recvfrom(1024)  
         ## 接收客戶端傳輸的資料，一次最多收1024bytes
-        
-        
         
        
         if struct.unpack('!b5sb', recvData[-7:]) == (0, b'octet', 0):
@@ -204,7 +173,6 @@ def main():
             ## 在將fileName解出來
             print("(1)opcode==",opcode)
             
-            # Request download
             # opcode == 1 means download
             if opcode[0] == 1:
                 t = Thread(target=download_thread, args=(fileName, clientInfo))
@@ -213,7 +181,6 @@ def main():
                 print("(2)opcode==",opcode)
                 
                 
-            # Request uploading
             # opcode == 2 means uploading
             elif opcode[0] == 2:
                 t = Thread(target=upload_thread, args=(fileName, clientInfo))
